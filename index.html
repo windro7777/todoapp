@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoApp</title>
+</head>
+<body>
+    <div id="app">
+        <h1>TodoApp</h1>
+        <input type="text" v-model="inputText" v-on:keyup.enter="addItem">    <!--(2)입력공간생성 (4)v-model로 화면입력을 개발도구data에 표시-->
+        <button v-on:click="fetchItems">add</button>  <!--(5)-->
+        <ul>
+            <li v-for="(todoItem, index) in todoItems">                             <!--(10) v-fpr사용-->
+                {{todoItem}}
+                <button v-on:click="removeItem(todoItem, index)">remove</button>   <!--(12) v-fpr사용-->
+            </li>  
+        </ul>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue( {
+            created: function() {      // (11) 입력때마다 add클릭없이 바로 뜨게...
+                this.fetchItems();
+            },
+            el: '#app',      // (1)--레고판을 마련한 것
+            data: {          // (3) 위 (2)의 input에 data를 연결하게 선언 
+                inputText: '',
+                todoItems: []
+            },
+            methods: {
+                removeItem: function(todoItem, index) {
+                    // axios.delete('/todos'+index)  
+                    console.log(todoItem, index);
+                    this.todoItems.splice(index, 1);        //(12) 매열을 지운다.
+                    localStorage.removeItem(todoItem);
+                },
+                addItem: function(event) {      // (6)
+                        console.log(event);         //enter를 포함하여 입력되는 key의 code를 볼 수 있다
+                        var value = this.inputText;
+                        localStorage.setItem(value, value);   // (7)서버대신 localStorage사용
+                        this.inputText = '';                  // (8) 화면입력란을 비우는 것
+                        this.todoItems.push(value);          // (13)
+                },
+                fetchItems: function() {
+                    // axios.get('/todos')  todoapp 이겠지..
+                    for (var i=0; i<localStorage.length; i++) {
+                        var value = localStorage.key(i);
+                        console.log(value);
+                        // console.log(this); 궁금하면 찍어본다
+                        this.todoItems.push(value);  //this는 this methods의미?
+                    }
+                }
+            }
+            
+        })
+    </script>
+</body>
+</html>
